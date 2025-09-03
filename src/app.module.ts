@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PostModule } from './post/post.module';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -12,7 +13,21 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     PostModule,
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // para ñ precisar importar em cada módulo
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        return {
+          type: 'postgres',
+          host: process.env.DB_HOST,
+          port: parseInt(process.env.DB_PORT || '5432', 10),
+          username: process.env.DB_USERNAME,
+          database: process.env.DB_DATABASE,
+          password: process.env.DB_PASSWORD,
+          autoLoadEntities: process.env.DB_AUTO_LOAD_ENTITIES === '1', // Carrega entidades sem precisar especificá-las
+          synchronize: process.env.DB_SYNCHRONIZE === '1', // Sincroniza com o BD. Ñ deve ser usado em prod
+        };
+      },
     }),
   ],
   controllers: [AppController],
