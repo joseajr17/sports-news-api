@@ -14,8 +14,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
-@Controller('users')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -38,9 +39,22 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  update(
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.userService.update(req.user.id, updateUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/password')
+  updatePassword(
+    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.userService.updatePassword(req.user.id, updatePasswordDto);
   }
 
   @Delete(':id')
