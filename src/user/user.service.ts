@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { HashingService } from 'src/commom/hashing/hashing.service';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -39,6 +39,10 @@ export class UsersService {
 
   findByEmail(email: string) {
     return this.userRepository.findOneBy({ email });
+  }
+
+  findById(id: string) {
+    return this.userRepository.findOneBy({ id });
   }
 
   save(user: User) {

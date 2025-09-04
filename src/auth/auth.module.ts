@@ -1,14 +1,14 @@
 import { InternalServerErrorException, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UsersModule } from 'src/users/users.module';
+import { UserModule } from 'src/user/user.module';
 import { CommomModule } from 'src/commom/commom.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
-    UsersModule,
+    UserModule,
     CommomModule,
     JwtModule.registerAsync({
       useFactory: () => {
