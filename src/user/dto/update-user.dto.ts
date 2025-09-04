@@ -4,5 +4,3 @@ import { CreateUserDto } from './create-user.dto';
 export class UpdateUserDto extends PartialType(
   OmitType(CreateUserDto, ['password']),
 ) {}
-
-const dto = new UpdateUserDto();
