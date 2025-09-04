@@ -37,6 +37,14 @@ export class UsersService {
     return this.userRepository.save(userCreated);
   }
 
+  findByEmail(email: string) {
+    return this.userRepository.findOneBy({ email });
+  }
+
+  save(user: User) {
+    return this.userRepository.save(user);
+  }
+
   findAll() {
     return `This action returns all users`;
   }
