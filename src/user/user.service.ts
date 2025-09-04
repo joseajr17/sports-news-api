@@ -42,16 +42,9 @@ export class UserService {
     return new UserResponseDto(userCreated);
   }
 
-  findByEmail(email: string) {
-    return this.userRepository.findOneBy({ email });
-  }
-
-  findById(id: string) {
-    return this.userRepository.findOneBy({ id });
-  }
-
-  save(user: User) {
-    return this.userRepository.save(user);
+  async findOne(id: string) {
+    const user = await this.findOneByOrFail({ id });
+    return new UserResponseDto(user);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -94,12 +87,23 @@ export class UserService {
     return new UserResponseDto(userUpdated);
   }
 
-  async findOneByOrFail(userData: Partial<User>) {
-    const user = await this.userRepository.findOneByOrFail(userData);
+  async remove(id: string) {
+    const user = await this.findOneByOrFail({ id });
+    await this.userRepository.delete({ id });
+    return new UserResponseDto(user);
+  }
 
-    if (!user) throw new NotFoundException('Usuário não encontrado.');
+  // Métodos auxiliares
+  findByEmail(email: string) {
+    return this.userRepository.findOneBy({ email });
+  }
 
-    return user;
+  findById(id: string) {
+    return this.userRepository.findOneBy({ id });
+  }
+
+  save(user: User) {
+    return this.userRepository.save(user);
   }
 
   async failIfEmailExists(email: string) {
@@ -110,15 +114,11 @@ export class UserService {
     if (existsUser) throw new ConflictException('Email já existe');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  async findOneByOrFail(userData: Partial<User>) {
+    const user = await this.userRepository.findOneByOrFail(userData);
 
-  findAll() {
-    return `This action returns all users`;
-  }
+    if (!user) throw new NotFoundException('Usuário não encontrado.');
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return user;
   }
 }

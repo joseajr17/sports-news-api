@@ -25,18 +25,10 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
-    console.log(req.user.id);
-    console.log(req.user.email);
-
-    return this.userService.findOne(+id);
+  @Get('me')
+  findOne(@Req() req: AuthenticatedRequest) {
+    return this.userService.findOne(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -57,8 +49,9 @@ export class UserController {
     return this.userService.updatePassword(req.user.id, updatePasswordDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @Delete('me')
+  remove(@Req() req: AuthenticatedRequest) {
+    return this.userService.remove(req.user.id);
   }
 }
