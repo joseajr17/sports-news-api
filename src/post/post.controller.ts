@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -28,23 +29,47 @@ export class PostController {
     return this.postService.create(createPostDto, req.user);
   }
 
+  @Get(':slug')
+  async findOnePublished(@Param('slug') slug: string) {
+    return this.postService.findOnePublished(slug);
+  }
+
   @Get()
-  findAll() {
-    return this.postService.findAll();
+  async findAllPublished() {
+    return this.postService.findAllPublished();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  @Get('me/:id')
+  findOneOwned(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.postService.findOneOwnedOrFail({ id }, req.user);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  findAllOwned(@Req() req: AuthenticatedRequest) {
+    return this.postService.findAllOwned(req.user);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/:id')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.postService.update({ id }, updatePostDto, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('me/:id')
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.postService.remove({ id }, req.user);
   }
 }
